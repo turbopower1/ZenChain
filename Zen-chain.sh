@@ -8,14 +8,14 @@ NC='\033[0m'
 # Prompts the user for the validator name
 read -p "Enter validator name: " VALIDATOR_NAME
 
-# Убедитесь, что система имеет необходимые зависимости
+# Г“ГЎГҐГ¤ГЁГІГҐГ±Гј, Г·ГІГ® Г±ГЁГ±ГІГҐГ¬Г  ГЁГ¬ГҐГҐГІ Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г»ГҐ Г§Г ГўГЁГ±ГЁГ¬Г®Г±ГІГЁ
 install_dependencies() {
     echo -e "${YELLOW}Checking and installing required dependencies...${NC}"
     sudo apt-get update
     sudo apt-get install -y jq curl git build-essential
 }
 
-# Убедитесь, что Docker и Docker Compose установлены.
+# Г“ГЎГҐГ¤ГЁГІГҐГ±Гј, Г·ГІГ® Docker ГЁ Docker Compose ГіГ±ГІГ Г­Г®ГўГ«ГҐГ­Г».
 check_docker_installation() {
     if ! command -v docker &>/dev/null; then
         echo -e "${YELLOW}Docker not found. Installing Docker...${NC}"
@@ -35,22 +35,22 @@ check_docker_installation() {
     fi
 }
 
-# Убедитесь, что каталог цепочки данных существует и имеет правильные разрешения.
+# Г“ГЎГҐГ¤ГЁГІГҐГ±Гј, Г·ГІГ® ГЄГ ГІГ Г«Г®ГЈ Г¶ГҐГЇГ®Г·ГЄГЁ Г¤Г Г­Г­Г»Гµ Г±ГіГ№ГҐГ±ГІГўГіГҐГІ ГЁ ГЁГ¬ГҐГҐГІ ГЇГ°Г ГўГЁГ«ГјГ­Г»ГҐ Г°Г Г§Г°ГҐГёГҐГ­ГЁГї.
 ensure_chain_data_directory() {
     echo -e "${YELLOW}Make sure the ./chain-data directory and permissions are correct...${NC}"
 
-    # Требуемый каталог
+    # Г’Г°ГҐГЎГіГҐГ¬Г»Г© ГЄГ ГІГ Г«Г®ГЈ
 
     mkdir -p ./chain-data
 
-    # Исправлены права доступа к каталогу
+    # Г€Г±ГЇГ°Г ГўГ«ГҐГ­Г» ГЇГ°Г ГўГ  Г¤Г®Г±ГІГіГЇГ  ГЄ ГЄГ ГІГ Г«Г®ГЈГі
     sudo chown -R $USER:$USER ./chain-data
     sudo chmod -R 755 ./chain-data
 
     echo -e "${GREEN}The ./chain-data directory and permissions are configured.${NC}"
 }
 
-# Создайте файл docker-compose.yml в текущем каталоге.
+# Г‘Г®Г§Г¤Г Г©ГІГҐ ГґГ Г©Г« docker-compose.yml Гў ГІГҐГЄГіГ№ГҐГ¬ ГЄГ ГІГ Г«Г®ГЈГҐ.
 create_docker_compose_file() {
     echo -e "${YELLOW}Create a docker-compose.yml file...${NC}"
     cat <<EOF >./docker-compose.yml
@@ -64,7 +64,7 @@ services:
     volumes:
       - ./chain-data:/chain-data
       - ./zenchain-config:/config
-    user: "${UID}:${GID}"  # Добавьте идентификаторы пользователей и групп в соответствии с теми, которые используются на хосте.
+    user: "${UID}:${GID}"  # Г„Г®ГЎГ ГўГјГІГҐ ГЁГ¤ГҐГ­ГІГЁГґГЁГЄГ ГІГ®Г°Г» ГЇГ®Г«ГјГ§Г®ГўГ ГІГҐГ«ГҐГ© ГЁ ГЈГ°ГіГЇГЇ Гў Г±Г®Г®ГІГўГҐГІГ±ГІГўГЁГЁ Г± ГІГҐГ¬ГЁ, ГЄГ®ГІГ®Г°Г»ГҐ ГЁГ±ГЇГ®Г«ГјГ§ГіГѕГІГ±Гї Г­Г  ГµГ®Г±ГІГҐ.
     command: >
       ./usr/bin/zenchain-node
       --base-path=/chain-data
@@ -79,32 +79,32 @@ EOF
     echo -e "${GREEN}The docker-compose.yml file is successfully created in the current directory.${NC}\n"
 }
 
-# Прежде чем запускать docker-compose, убедитесь, что вы находитесь в правильном каталоге.
+# ГЏГ°ГҐГ¦Г¤ГҐ Г·ГҐГ¬ Г§Г ГЇГіГ±ГЄГ ГІГј docker-compose, ГіГЎГҐГ¤ГЁГІГҐГ±Гј, Г·ГІГ® ГўГ» Г­Г ГµГ®Г¤ГЁГІГҐГ±Гј Гў ГЇГ°Г ГўГЁГ«ГјГ­Г®Г¬ ГЄГ ГІГ Г«Г®ГЈГҐ.
 run_docker_compose() {
     echo -e "${YELLOW}Running Docker Compose for the ZenChain node...${NC}"
 
-    # Сохраняет текущий каталог
+    # Г‘Г®ГµГ°Г Г­ГїГҐГІ ГІГҐГЄГіГ№ГЁГ© ГЄГ ГІГ Г«Г®ГЈ
     CURRENT_DIR=$(pwd)
 
-    # Убедитесь, что мы находимся в том же каталоге, что и docker-compose.yml.
+    # Г“ГЎГҐГ¤ГЁГІГҐГ±Гј, Г·ГІГ® Г¬Г» Г­Г ГµГ®Г¤ГЁГ¬Г±Гї Гў ГІГ®Г¬ Г¦ГҐ ГЄГ ГІГ Г«Г®ГЈГҐ, Г·ГІГ® ГЁ docker-compose.yml.
     if [[ ! -f ./docker-compose.yml ]]; then
         echo -e "${RED}The file docker-compose.yml was not found in this directory!${NC}"
         exit 1
     fi
 
-    # Запустите docker-compose из каталога, где расположены файлы.
+    # Г‡Г ГЇГіГ±ГІГЁГІГҐ docker-compose ГЁГ§ ГЄГ ГІГ Г«Г®ГЈГ , ГЈГ¤ГҐ Г°Г Г±ГЇГ®Г«Г®Г¦ГҐГ­Г» ГґГ Г©Г«Г».
     docker-compose down
     docker-compose up -d
     echo -e "${GREEN}The ZenChain node is running successfully.${NC}"
 }
 
-# Подождите 60 секунд, чтобы убедиться, что RPC активен.
+# ГЏГ®Г¤Г®Г¦Г¤ГЁГІГҐ 60 Г±ГҐГЄГіГ­Г¤, Г·ГІГ®ГЎГ» ГіГЎГҐГ¤ГЁГІГјГ±Гї, Г·ГІГ® RPC Г ГЄГІГЁГўГҐГ­.
 wait_for_rpc() {
     echo -e "${YELLOW}Waiting 60 seconds to make sure RPC is active...${NC}"
     sleep 60
 }
 
-# Получить сеансовые ключи
+# ГЏГ®Г«ГіГ·ГЁГІГј Г±ГҐГ Г­Г±Г®ГўГ»ГҐ ГЄГ«ГѕГ·ГЁ
 get_session_keys() {
     echo -e "${YELLOW}Obtaining session keys...${NC}"
     SESSION_KEYS=$(curl --max-time 10 --silent --retry 5 --retry-delay 5 --url http://localhost:9944 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"author_rotateKeys","params":[],"id":1}' | jq -r .result)
@@ -117,13 +117,13 @@ get_session_keys() {
     fi
 }
 
-# Просмотр журналов из контейнеров Zenchain Docker
+# ГЏГ°Г®Г±Г¬Г®ГІГ° Г¦ГіГ°Г­Г Г«Г®Гў ГЁГ§ ГЄГ®Г­ГІГҐГ©Г­ГҐГ°Г®Гў Zenchain Docker
 view_logs() {
     echo -e "${YELLOW}Viewing logs from a Zenchain Docker container...${NC}"
     docker logs -f zenchain
 }
 
-# Спрашивает, хотите ли вы просмотреть журналы после завершения установки.
+# Г‘ГЇГ°Г ГёГЁГўГ ГҐГІ, ГµГ®ГІГЁГІГҐ Г«ГЁ ГўГ» ГЇГ°Г®Г±Г¬Г®ГІГ°ГҐГІГј Г¦ГіГ°Г­Г Г«Г» ГЇГ®Г±Г«ГҐ Г§Г ГўГҐГ°ГёГҐГ­ГЁГї ГіГ±ГІГ Г­Г®ГўГЄГЁ.
 view_logs_option() {
     echo -e "${YELLOW}Want to view ZenChain node logs?(y/n)${NC}"
     read -p "Pilih opsi: " VIEW_LOGS
@@ -134,13 +134,13 @@ view_logs_option() {
     fi
 }
 
-# Отображает приглашение присоединиться к каналу Telegram.
+# ГЋГІГ®ГЎГ°Г Г¦Г ГҐГІ ГЇГ°ГЁГЈГ«Г ГёГҐГ­ГЁГҐ ГЇГ°ГЁГ±Г®ГҐГ¤ГЁГ­ГЁГІГјГ±Гї ГЄ ГЄГ Г­Г Г«Гі Telegram.
 join_telegram_channel() {
     echo -e "${GREEN}Don't forget to write thanks in Telegram  ${NC}"
-    echo -e "${GREEN}рџ‘‰ ${YELLOW}https://t.me/Swapapparat${NC}"
+    echo -e "${GREEN}Г°ЕёвЂвЂ° ${YELLOW}https://t.me/Swapapparat${NC}"
 }
 
-# Выполняем все шаги
+# Г‚Г»ГЇГ®Г«Г­ГїГҐГ¬ ГўГ±ГҐ ГёГ ГЈГЁ
 install_dependencies
 check_docker_installation
 ensure_chain_data_directory
@@ -149,8 +149,8 @@ run_docker_compose
 wait_for_rpc
 get_session_keys
 
-# Отображает возможность просмотра журналов
+# ГЋГІГ®ГЎГ°Г Г¦Г ГҐГІ ГўГ®Г§Г¬Г®Г¦Г­Г®Г±ГІГј ГЇГ°Г®Г±Г¬Г®ГІГ°Г  Г¦ГіГ°Г­Г Г«Г®Гў
 view_logs_option
 
-# Отображает приглашение присоединиться к каналу Telegram.
+# ГЋГІГ®ГЎГ°Г Г¦Г ГҐГІ ГЇГ°ГЁГЈГ«Г ГёГҐГ­ГЁГҐ ГЇГ°ГЁГ±Г®ГҐГ¤ГЁГ­ГЁГІГјГ±Гї ГЄ ГЄГ Г­Г Г«Гі Telegram.
 join_telegram_channel
