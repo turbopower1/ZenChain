@@ -8,14 +8,14 @@ NC='\033[0m'
 # Prompts the user for the validator name
 read -p "Enter validator name: " VALIDATOR_NAME
 
-# Óáåäèòåñü, ÷òî ñèñòåìà èìååò íåîáõîäèìûå çàâèñèìîñòè
+# Make sure the system has the required dependencies
 install_dependencies() {
     echo -e "${YELLOW}Checking and installing required dependencies...${NC}"
     sudo apt-get update
     sudo apt-get install -y jq curl git build-essential
 }
 
-# Óáåäèòåñü, ÷òî Docker è Docker Compose óñòàíîâëåíû.
+# Make sure Docker and Docker Compose are installed.
 check_docker_installation() {
     if ! command -v docker &>/dev/null; then
         echo -e "${YELLOW}Docker not found. Installing Docker...${NC}"
@@ -35,22 +35,22 @@ check_docker_installation() {
     fi
 }
 
-# Óáåäèòåñü, ÷òî êàòàëîã öåïî÷êè äàííûõ ñóùåñòâóåò è èìååò ïðàâèëüíûå ðàçðåøåíèÿ.
+# Verify that the data chain directory exists and has the correct permissions.
 ensure_chain_data_directory() {
     echo -e "${YELLOW}Make sure the ./chain-data directory and permissions are correct...${NC}"
 
-    # Òðåáóåìûé êàòàëîã
+    # Required directory
 
     mkdir -p ./chain-data
 
-    # Èñïðàâëåíû ïðàâà äîñòóïà ê êàòàëîãó
+    # Fixed directory permissions
     sudo chown -R $USER:$USER ./chain-data
     sudo chmod -R 755 ./chain-data
 
     echo -e "${GREEN}The ./chain-data directory and permissions are configured.${NC}"
 }
 
-# Ñîçäàéòå ôàéë docker-compose.yml â òåêóùåì êàòàëîãå.
+# Create a docker-compose.yml file in the current directory.
 create_docker_compose_file() {
     echo -e "${YELLOW}Create a docker-compose.yml file...${NC}"
     cat <<EOF >./docker-compose.yml
@@ -64,7 +64,7 @@ services:
     volumes:
       - ./chain-data:/chain-data
       - ./zenchain-config:/config
-    user: "${UID}:${GID}"  # Äîáàâüòå èäåíòèôèêàòîðû ïîëüçîâàòåëåé è ãðóïï â ñîîòâåòñòâèè ñ òåìè, êîòîðûå èñïîëüçóþòñÿ íà õîñòå.
+    user: "${UID}:${GID}"  # Add user and group IDs according to those used on the host.
     command: >
       ./usr/bin/zenchain-node
       --base-path=/chain-data
@@ -79,32 +79,32 @@ EOF
     echo -e "${GREEN}The docker-compose.yml file is successfully created in the current directory.${NC}\n"
 }
 
-# Ïðåæäå ÷åì çàïóñêàòü docker-compose, óáåäèòåñü, ÷òî âû íàõîäèòåñü â ïðàâèëüíîì êàòàëîãå.
+# Before running docker-compose, make sure you are in the correct directory.
 run_docker_compose() {
     echo -e "${YELLOW}Running Docker Compose for the ZenChain node...${NC}"
 
-    # Ñîõðàíÿåò òåêóùèé êàòàëîã
+    # Saves the current directory
     CURRENT_DIR=$(pwd)
 
-    # Óáåäèòåñü, ÷òî ìû íàõîäèìñÿ â òîì æå êàòàëîãå, ÷òî è docker-compose.yml.
+    # Make sure we are in the same directory as docker-compose.yml.
     if [[ ! -f ./docker-compose.yml ]]; then
         echo -e "${RED}The file docker-compose.yml was not found in this directory!${NC}"
         exit 1
     fi
 
-    # Çàïóñòèòå docker-compose èç êàòàëîãà, ãäå ðàñïîëîæåíû ôàéëû.
+    # Run docker-compose from the directory where the files are located.
     docker-compose down
     docker-compose up -d
     echo -e "${GREEN}The ZenChain node is running successfully.${NC}"
 }
 
-# Ïîäîæäèòå 60 ñåêóíä, ÷òîáû óáåäèòüñÿ, ÷òî RPC àêòèâåí.
+# Wait 60 seconds to ensure RPC is active.
 wait_for_rpc() {
     echo -e "${YELLOW}Waiting 60 seconds to make sure RPC is active...${NC}"
     sleep 60
 }
 
-# Ïîëó÷èòü ñåàíñîâûå êëþ÷è
+# Get session keys
 get_session_keys() {
     echo -e "${YELLOW}Obtaining session keys...${NC}"
     SESSION_KEYS=$(curl --max-time 10 --silent --retry 5 --retry-delay 5 --url http://localhost:9944 -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"author_rotateKeys","params":[],"id":1}' | jq -r .result)
@@ -117,13 +117,13 @@ get_session_keys() {
     fi
 }
 
-# Ïðîñìîòð æóðíàëîâ èç êîíòåéíåðîâ Zenchain Docker
+# Viewing logs from Zenchain Docker containers
 view_logs() {
     echo -e "${YELLOW}Viewing logs from a Zenchain Docker container...${NC}"
     docker logs -f zenchain
 }
 
-# Ñïðàøèâàåò, õîòèòå ëè âû ïðîñìîòðåòü æóðíàëû ïîñëå çàâåðøåíèÿ óñòàíîâêè.
+# Asks if you want to view the logs after the installation is complete.
 view_logs_option() {
     echo -e "${YELLOW}Want to view ZenChain node logs?(y/n)${NC}"
     read -p "Pilih opsi: " VIEW_LOGS
@@ -134,13 +134,13 @@ view_logs_option() {
     fi
 }
 
-# Îòîáðàæàåò ïðèãëàøåíèå ïðèñîåäèíèòüñÿ ê êàíàëó Telegram.
+# Displays an invitation to join a Telegram channel.
 join_telegram_channel() {
     echo -e "${GREEN}Don't forget to write thanks in Telegram  ${NC}"
-    echo -e "${GREEN}ðŸ‘‰ ${YELLOW}https://t.me/Swapapparat${NC}"
+    echo -e "${GREEN}рџ‘‰ ${YELLOW}https://t.me/Swapapparat${NC}"
 }
 
-# Âûïîëíÿåì âñå øàãè
+# We carry out all the steps
 install_dependencies
 check_docker_installation
 ensure_chain_data_directory
@@ -149,8 +149,8 @@ run_docker_compose
 wait_for_rpc
 get_session_keys
 
-# Îòîáðàæàåò âîçìîæíîñòü ïðîñìîòðà æóðíàëîâ
+# Displays the ability to view logs
 view_logs_option
 
-# Îòîáðàæàåò ïðèãëàøåíèå ïðèñîåäèíèòüñÿ ê êàíàëó Telegram.
+# Displays an invitation to join a Telegram channel.
 join_telegram_channel
